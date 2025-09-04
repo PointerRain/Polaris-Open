@@ -205,6 +205,7 @@ app.get("/api/settings/:id", async function(req, res) {
             id: x.id,
             name: x.name,
             color: x.hexColor,
+            colors: Object.values(x.colors).filter(c => c != null),
             managed: x.managed,
             grantable: x.editable && x.id != guild.id
         }))
@@ -626,7 +627,8 @@ app.get("/api/leaderboard/:id", cors(), async function(req, res) {
         let roles = guild.roles.cache.filter(r => xd.importantRoles.includes(r.id)).sort((a, b) => b.position - a.position).map(x => ({
             id: x.id,
             name: x.name,
-            color: x.hexColor
+            color: x.hexColor,
+            colors: Object.values(x.colors).filter(c => c != null),
         }))
 
         let members = await guild.members.fetch({user: xd.members}).then(list => list.map(x => ({
@@ -637,6 +639,7 @@ app.get("/api/leaderboard/:id", cors(), async function(req, res) {
             nickname: x.nickname,
             avatar: x.displayAvatarURL({format: "png", dynamic: true}),
             color: x.displayHexColor,
+            colors: Object.values(x.roles.color.colors).filter(c => c != null),
             roles: x.roles.cache.filter(r => xd.importantRoles.includes(r.id)).map(r => r.id)
         }) )).catch((() => []))
 
