@@ -391,6 +391,9 @@ Fetch(`/api/leaderboard/${guildID}`).then(data => {
             let userSlot = leaderboardSlot.clone()
             let userXP = getLevel(x.xp, data.settings)
             let multiplier = getMultiplier(x.roles, data.settings, data.roles)
+            let progressStyle = x.colors && x.colors.length > 1
+                ? { "background-image": `linear-gradient(to right, ${x.colors.map(c => roleCol(c)).join(", ")})` }
+                : { "background-color": x.missing ? "rgba(118, 126, 137, 0.5)" : roleCol(x.color || "white") };
             if (x.missing) {
                 userSlot.addClass('notInServer')
                 userSlot.find("[lb=warning]").show()
@@ -406,7 +409,7 @@ Fetch(`/api/leaderboard/${guildID}`).then(data => {
             userSlot.find("[lb=name]").text(x.nickname || x.displayName || `<@${x.id}>`).attr("title", x.missing ? "Not in server!" : `${x.displayName} (@${x.username})`)
             userSlot.find("[lb=level]").text(`Level ${commafy(userXP.level)}`)
             userSlot.find("[lb=pfp]").attr("src", x.avatar || "/assets/avatar.png")
-            userSlot.find("[lb=progress]").css("background-color", x.missing ? "rgba(118, 126, 137, 0.5)" : roleCol(x.color || "white")).css("width", userXP.percentage + "%")
+            userSlot.find("[lb=progress]").css(progressStyle).css("width", userXP.percentage + "%")
             userSlot.find("[lb=xp]").html(`${commafy(x.xp)} / ${commafy(userXP.xpRequired)} XP${data.settings.rankCard.relativeLevel ? ` &nbsp • &nbsp; ${commafy(x.xp - userXP.previousLevel)} / ${commafy(userXP.xpRequired - userXP.previousLevel)}` : ""}`)
             userSlot.find("[lb=percent]").text(`(${+userXP.percentage.toFixed(2)}%)`)
 
@@ -502,10 +505,14 @@ Fetch(`/api/leaderboard/${guildID}`).then(data => {
         $('#noRankInfo').remove()
 
         // account info
+        const progressStyle = data.user.colors && data.user.colors.length > 1
+            ? { "background-image": `linear-gradient(to right, ${data.user.colors.map(roleCol).join(", ")})` }
+            : { "background-color": data.user.missing ? "rgba(118, 126, 137, 0.5)" : roleCol(data.user.color || "white") };
+
         $('#accountInfo [lb=pfp]').attr('src', data.user.avatar)
         $('#accountInfo [lb=name]').text(data.user.nickname || data.user.displayName).css("color", userColor)
         $('#accountInfo [lb=level]').text(`Level ${commafy(userLevel.level)}`).css("color", userColor)
-        $('#accountInfo [lb=progress]').css('background-color', userColor).css('width', userLevel.percentage + "%")
+        $('#accountInfo [lb=progress]').css(progressStyle).css('width', userLevel.percentage + "%")
         $('#accountInfo [lb=xp]').text(`${commafy(data.user.xp)} / ${commafy(userLevel.xpRequired)} XP`).css("color", userColor)
         $('#accountInfo [lb=percent]').text(`(${+userLevel.percentage.toFixed(2)}%)`).css("color", userColor)
         $('#accountInfo [lb=ranking]').text(data.user.hidden ? `Hidden from server leaderboard. Gain XP to be automatically unhidden!` : `Ranked #${data.user.rank} in ${data.guild.name}`)

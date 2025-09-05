@@ -639,7 +639,7 @@ app.get("/api/leaderboard/:id", cors(), async function(req, res) {
             nickname: x.nickname,
             avatar: x.displayAvatarURL({format: "png", dynamic: true}),
             color: x.displayHexColor,
-            colors: Object.values(x.roles.color.colors).filter(c => c != null),
+            colors: Object.values(x.roles.color.colors).filter(c => c != null).map(c => '#' + c.toString(16)),
             roles: x.roles.cache.filter(r => xd.importantRoles.includes(r.id)).map(r => r.id)
         }) )).catch((() => []))
 
