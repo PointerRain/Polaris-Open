@@ -464,10 +464,13 @@ Fetch(`/api/leaderboard/${guildID}`).then(data => {
         let roleColor = roleCol(role.color)
         let reachedRole = roleProgress >= 100
         let hasRole = loggedIn && data.user.id && data.user.roles.includes(r.id)
+        let progressStyle = role.colors && role.colors.length > 1
+                ? { "background-image": `linear-gradient(to right, ${role.colors.map(c => roleCol(c)).join(", ")})` }
+                : { "background-color": roleCol(role.color) };
         rSlot.find("[lb=role]").text(role.name).css("color", roleColor)
         rSlot.find("[lb=level]").text("Level " + commafy(r.level)).css("color", reachedRole ? roleColor : "#bbbbbb")
         rSlot.find("[lb=percent]").text(!loggedIn ? `${commafy(roleXP)} XP` : reachedRole ? (hasRole ? "Obtained!" : "Reached!") : `${+roleProgress.toFixed(2)}% reached (${commafy(data.user.xp || 0)} / ${commafy(roleXP)} XP)`)
-        rSlot.find("[lb=progress]").css("width", Math.min(roleProgress, 100) + "%").css("background-color", roleColor)
+        rSlot.find("[lb=progress]").css("width", Math.min(roleProgress, 100) + "%").css(progressStyle)
         $('#roleList').append(rSlot)
     })
     if (data.settings.rewards.length) $('#noRewardRoles').remove()
